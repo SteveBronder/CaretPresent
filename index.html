@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>caret in R</title>
+  <meta charset="utf-8">
+  <meta name="description" content="caret in R">
+  <meta name="author" content="Steve Bronder">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>caret in R</h1>
+    <h2>A Meta Language for Machine Learning</h2>
+    <p>Steve Bronder<br/>QMSS 2016</p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <article data-timings="">
+    <!-- Limit image width and height -->
+
+<style type='text/css'>
+img {
+    max-height: 540px;
+    max-width: 964px;
+}
+</style>
+
+<!-- Center image on slide -->
+
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+
+<script type='text/javascript'>
+$(function() {
+    $("p:has(img)").addClass('centered');
+});
+</script>
+
+<h2>What is Caret</h2>
+
+<ul>
+<li>Classification And REgression Training</li>
+<li>Meta language for uniform model building framework</li>
+<li>Algorithmically break down model building process</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-2" style="background:;">
+  <hgroup>
+    <h2>Data Workflow</h2>
+  </hgroup>
+  <article data-timings="">
+    
+<div style='float:left;width:48%;' class='centered'>
+  <p><img src="flownames.jpeg" alt=""> </p>
+
+</div>
+<div style='float:right;width:48%;'>
+  <p>_</p>
+
+</div>
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-3" style="background:;">
+  <hgroup>
+    <h2>Data Workflow With caret</h2>
+  </hgroup>
+  <article data-timings="">
+    
+<div style='float:left;width:48%;' class='centered'>
+  <p><img src="flownames.jpeg" alt=""> </p>
+
+</div>
+<div style='float:right;width:48%;'>
+  <p><img src="flowfuncs.jpeg" alt=""> </p>
+
+</div>
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-4" style="background:;">
+  <hgroup>
+    <h2>Cut Data</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Want to create test and train set:</p>
+
+<ul>
+<li>Need unseen data in order to evaluate model on new data</li>
+<li>Can easily bias through bad splitting</li>
+<li>createDataPartition()</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-5" style="background:;">
+  <hgroup>
+    <h3>Ex: Split into test and train</h3>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">library(caret)
+library(randomForest)
+etitanic &lt;- read.csv(&quot;TrainTitanic.csv&quot;,header=TRUE)
+etitanic$Cabin &lt;- substr(etitanic$Cabin, 1, 1)
+etitanic[which(etitanic$Cabin == &quot;&quot;),&quot;Cabin&quot;] &lt;- &quot;No.Cabin&quot;
+etitanic$Cabin &lt;- factor(etitanic$Cabin)
+etitanic$Survived &lt;- factor(etitanic$Survived, levels = c(0,1),labels = c(&quot;Dead&quot;,&quot;Alive&quot;))
+table(etitanic$Survived)
+</code></pre>
+
+<pre><code>## 
+##  Dead Alive 
+##   549   342
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-6" style="background:;">
+  <hgroup>
+    <h3>Why not just use sample()?</h3>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">set.seed(4334)
+x &lt;- rep(0,100)
+x[c(1,4,8,9,14)] &lt;- 1
+x
+</code></pre>
+
+<pre><code>##   [1] 1 0 0 1 0 0 0 1 1 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+##  [36] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+##  [71] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+</code></pre>
+
+<pre><code class="r">sample(x,30)
+</code></pre>
+
+<pre><code>##  [1] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-7" style="background:;">
+  <hgroup>
+    <h3>Data Partition</h3>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">index &lt;- createDataPartition(etitanic$Survived, 
+                             p = 0.8, # Percent of data that goes into training
+                             list = FALSE, # do not return a list
+) 
+ytrain &lt;- etitanic[index,&quot;Survived&quot;]
+ytest &lt;- etitanic[-index,&quot;Survived&quot;]
+train &lt;- etitanic[index,-2]
+test &lt;- etitanic[-index,-2]
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-8" style="background:;">
+  <hgroup>
+    <h3>Ex: Split into test and train</h3>
+  </hgroup>
+  <article data-timings="">
+    <pre><code>[[1]]
+ytrain
+ Dead Alive 
+  440   274 
+
+[[2]]
+ytest
+ Dead Alive 
+  109    68 
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-9" style="background:;">
+  <hgroup>
+    <h3>Ex: Split into test and train</h3>
+  </hgroup>
+  <article data-timings="">
+    <pre><code>&#39;data.frame&#39;:   714 obs. of  11 variables:
+ $ PassengerId: int  1 2 3 4 5 6 7 8 9 10 ...
+ $ Pclass     : int  3 1 3 1 3 3 1 3 3 2 ...
+ $ Name       : Factor w/ 891 levels &quot;Abbing, Mr. Anthony&quot;,..: 109 191 358 277 16 559 520 629 416 581 ...
+ $ Sex        : Factor w/ 2 levels &quot;female&quot;,&quot;male&quot;: 2 1 1 1 2 2 2 2 1 1 ...
+ $ Age        : num  22 38 26 35 35 NA 54 2 27 14 ...
+ $ SibSp      : int  1 1 0 1 0 0 0 3 0 1 ...
+ $ Parch      : int  0 0 0 0 0 0 0 1 2 0 ...
+ $ Ticket     : Factor w/ 681 levels &quot;110152&quot;,&quot;110413&quot;,..: 525 596 662 50 473 276 86 396 345 133 ...
+ $ Fare       : num  7.25 71.28 7.92 53.1 8.05 ...
+ $ Cabin      : Factor w/ 9 levels &quot;A&quot;,&quot;B&quot;,&quot;C&quot;,&quot;D&quot;,..: 8 3 8 3 8 8 5 8 8 8 ...
+ $ Embarked   : Factor w/ 4 levels &quot;&quot;,&quot;C&quot;,&quot;Q&quot;,&quot;S&quot;: 4 2 4 4 4 3 4 4 4 2 ...
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-10" style="background:;">
+  <hgroup>
+    <h2>Preprocess</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>Data IRL is going to be gross/bad</li>
+<li>Want to maintain charateristics in train/test</li>
+<li>Models need assumptions to exist in data</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-11" style="background:;">
+  <hgroup>
+    <h2>The Meat: Preprocess()</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>&quot;Meatest Method&quot; = method</li>
+<li>Possible values are &quot;BoxCox&quot;,
+&quot;YeoJohnson&quot;, &quot;expoTrans&quot;, &quot;center&quot;, &quot;scale&quot;, &quot;range&quot;, &quot;knnImpute&quot;, &quot;bagImpute&quot;,
+&quot;medianImpute&quot;, &quot;pca&quot;, &quot;ica&quot;, &quot;spatialSign&quot;, &quot;zv&quot;, &quot;nzv&quot;, and &quot;conditionalX&quot;</li>
+</ul>
+
+<hr>
+
+<h3>EX: Preprocess()</h3>
+
+<pre><code class="r">preProcValues &lt;- preProcess(train[,c(&quot;Fare&quot;,&quot;Age&quot;)],
+                            method = c(&quot;center&quot;, &quot;scale&quot;,&quot;BoxCox&quot;,&quot;expoTrans&quot;))
+
+
+trainTrans &lt;- predict(preProcValues, train)
+testTrans &lt;- predict(preProcValues, test)
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-12" style="background:;">
+  <hgroup>
+    <h2>Data Workflow</h2>
+  </hgroup>
+  <article data-timings="">
+    
+<div style='float:left;width:48%;' class='centered'>
+  <pre><code class="r">plot(density(train$Fare))
+</code></pre>
+
+<p><img src="assets/fig/beforetrans-1.png" alt="plot of chunk beforetrans"> </p>
+
+</div>
+<div style='float:right;width:48%;'>
+  <pre><code class="r">plot(density(trainTrans$Fare))
+</code></pre>
+
+<p><img src="assets/fig/aftertrans-1.png" alt="plot of chunk aftertrans"> </p>
+
+</div>
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-13" style="background:;">
+  <hgroup>
+    <h3>Ex: Preprocess - Dummies</h3>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">dummies &lt;- dummyVars(~ ., data = train)
+train &lt;- predict(dummies, newdata = train)
+test &lt;- predict(dummies,newdata = test)
+dim(train)
+</code></pre>
+
+<pre><code>[1]  714 1593
+</code></pre>
+
+<pre><code class="r">table(train[,&quot;Ticket.STON/O2. 3101279&quot;])
+</code></pre>
+
+<pre><code>
+  0   1 
+713   1 
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-14" style="background:;">
+  <hgroup>
+    <h2>We need to get rid of Near Zero Variance Predictors</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>Predictors with only one value (Sally G. Wentworth)</li>
+<li>percentUnique: Predictors with very few unique values relative to the sample</li>
+<li>freqRatio: Ratio of the frequency of most common value to second most common</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-15" style="background:;">
+  <hgroup>
+    <h3>Ex: Preprocess - NZV</h3>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">nzv &lt;- nearZeroVar(train, saveMetrics= TRUE)
+head(nzv)
+</code></pre>
+
+<pre><code>                                       freqRatio percentUnique zeroVar
+PassengerId                             1.000000   100.0000000   FALSE
+Pclass                                  2.352941     0.4201681   FALSE
+Name.Abbing, Mr. Anthony              713.000000     0.2801120   FALSE
+Name.Abbott, Mr. Rossmore Edward        0.000000     0.1400560    TRUE
+Name.Abbott, Mrs. Stanton (Rosa Hunt) 713.000000     0.2801120   FALSE
+Name.Abelson, Mr. Samuel              713.000000     0.2801120   FALSE
+                                        nzv
+PassengerId                           FALSE
+Pclass                                FALSE
+Name.Abbing, Mr. Anthony               TRUE
+Name.Abbott, Mr. Rossmore Edward       TRUE
+Name.Abbott, Mrs. Stanton (Rosa Hunt)  TRUE
+Name.Abelson, Mr. Samuel               TRUE
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-16" style="background:;">
+  <hgroup>
+    <h3>Ex: Preprocess - NZV</h3>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">nzv &lt;- nearZeroVar(train)
+train &lt;- train[,-nzv]
+test &lt;- test[,-nzv]
+dim(train)
+</code></pre>
+
+<pre><code>## [1] 714  14
+</code></pre>
+
+<pre><code>## [1] 714  14
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-17" style="background:;">
+  <hgroup>
+    <h3>Ex: Preprocess - Linear Combinations</h3>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">comboInfo &lt;- findLinearCombos(trainTrans)
+colnames(trainTrans)[comboInfo$remove]
+if (length(colnames(train)[comboInfo$remove])!=0 &amp;&amp;
+    !is.character(colnames(train)[comboInfo$remove]) ){
+  train &lt;- train[, -comboInfo$remove]
+}
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-18" style="background:;">
+  <hgroup>
+    <h2>Some things to know</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><img src="table.png" alt=""> </p>
+
+<p><img src="cm.png" alt=""> </p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-19" style="background:;">
+  <hgroup>
+    <h2>Feature Importance</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r"> rfctrl &lt;- rfeControl(functions = rfFuncs, 
+                      method = &quot;cv&quot;, 
+                      number = 10)
+ trainTransprof &lt;- trainTrans[complete.cases(trainTrans),]
+ ytrainprof &lt;- ytrain[complete.cases(trainTrans)]
+  rfprofile &lt;- rfe( trainTransprof , ytrainprof,
+                   sizes = c(2:13),
+                   rfeControl = rfctrl)
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-20" style="background:;">
+  <article data-timings="">
+    <pre><code class="r">rfprofile$results
+</code></pre>
+
+<pre><code>   Variables  Accuracy     Kappa AccuracySD    KappaSD
+1          2 0.7807018 0.5290439 0.04472824 0.09639137
+2          3 0.7894737 0.5558118 0.04678363 0.09518625
+3          4 0.8000000 0.5702758 0.03807911 0.08305862
+4          5 0.8052632 0.5818258 0.03918565 0.08956240
+5          6 0.8245614 0.6246790 0.03308102 0.06930706
+6          7 0.8157895 0.6053460 0.03121953 0.06648998
+7          8 0.8245614 0.6252737 0.03698570 0.07762233
+8          9 0.8192982 0.6132189 0.04221072 0.09132594
+9         10 0.8192982 0.6125347 0.04221072 0.08945815
+10        11 0.8192982 0.6134942 0.04754497 0.10175326
+11        12 0.8140351 0.6034660 0.04692960 0.10133317
+12        13 0.8105263 0.5961178 0.04514680 0.09666723
+</code></pre>
+
+<pre><code class="r">rfprofile$optVariables
+</code></pre>
+
+<pre><code>[1] &quot;Sex.male&quot;       &quot;Sex.female&quot;     &quot;Pclass&quot;         &quot;Age&quot;           
+[5] &quot;SibSp&quot;          &quot;Cabin.No.Cabin&quot;
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-21" style="background:;">
+  <hgroup>
+    <h3>Our Model: C5.0</h3>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>I like it</li>
+<li>Pretty cool</li>
+<li>Heuristic Explenation</li>
+<li>See Max Kuhns book, &quot;Applied Predictive Modeling&quot;</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-22" style="background:;">
+  <hgroup>
+    <h3>Putting it all together with train()</h3>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">c50Fit1 &lt;- train(x = train, y = ytrain,
+                  method = &quot;C5.0&quot;,
+                  metric = &quot;ROC&quot;,
+                  trControl = trainControl(method = &quot;cv&quot;,
+                                           number = 10,
+                                           summaryFunction = twoClassSummary,
+                                           classProbs = TRUE),
+                  tuneGrid = expand.grid(trials = c(1:10)*4,
+                                         model = c(&quot;rules&quot;,&quot;tree&quot;),
+                                         winnow = c(FALSE,TRUE)))
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-23" style="background:;">
+  <hgroup>
+    <h2>Model Tuning: tuneGrid</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>Searches grid of possible tuning values</li>
+<li>Gives back best model parameters</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-24" style="background:;">
+  <hgroup>
+    <h3>expand.grid is great</h3>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r"> c50Grid &lt;- expand.grid(trials = c(1:20)*4,
+                        model = c(&quot;rules&quot;,&quot;tree&quot;),
+                        winnow = c(FALSE,TRUE))
+c50Grid[sample.int(40,5),]
+</code></pre>
+
+<pre><code>##    trials model winnow
+## 23     12  tree  FALSE
+## 12     48 rules  FALSE
+## 17     68 rules  FALSE
+## 29     36  tree  FALSE
+## 16     64 rules  FALSE
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-25" style="background:;">
+  <hgroup>
+    <h3>Plotting Grid</h3>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">wireframe(ROC~trials * (as.numeric(winnow)+as.numeric(model)), data = c50Fit1$results,
+          xlab = &quot;Trials&quot;, ylab = &quot;Winnowing + Model&quot;, main = &quot;C50 Tuning Grid&quot;,
+          drape = TRUE, colorkey = TRUE, screen = list(z = 40, x = -70),
+          zlab = list(&quot;ROC&quot;, rot = 90))
+</code></pre>
+
+<p><img src="assets/fig/c50wire-1.png" alt="plot of chunk c50wire"> </p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-26" style="background:;">
+  <hgroup>
+    <h3>Model Evaluation</h3>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">xx &lt;- c50Fit1$bestTune
+subset(c50Fit1$results,trials == xx[[1]] &amp; model == xx[[2]] &amp; winnow == xx[[3]])
+</code></pre>
+
+<pre><code>##    model winnow trials       ROC      Sens      Spec      ROCSD     SensSD
+## 33  tree   TRUE     12 0.8610465 0.9045455 0.6966931 0.05294011 0.03979977
+##        SpecSD
+## 33 0.09847575
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-27" style="background:;">
+  <hgroup>
+    <h3>Plotting Model Eval</h3>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">plot(c50Fit1)
+</code></pre>
+
+<p><img src="assets/fig/c50eval666-1.png" alt="plot of chunk c50eval666"> </p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-28" style="background:;">
+  <hgroup>
+    <h3>Control Function</h3>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">#
+  fitControl &lt;- trainControl(## 10-fold CV
+   method = &quot;cv&quot;,
+   number = 10,
+   summaryFunction = twoClassSummary,
+   classProbs = TRUE)
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-29" style="background:;">
+  <hgroup>
+    <h3>Model Evaluation</h3>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">#
+ testPred &lt;- predict(c50Fit1, test)
+ confusionMatrix(testPred, ytest)$table
+</code></pre>
+
+<pre><code>##           Reference
+## Prediction Dead Alive
+##      Dead    92    21
+##      Alive   17    47
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-30" style="background:;">
+  <hgroup>
+    <h3>Trying again</h3>
+  </hgroup>
+  <article data-timings="">
+    <h1>With preprocessed data</h1>
+
+<pre><code class="r"> c50Fit2 &lt;- train(x = trainTrans, y = ytrain,
+                  method = &quot;C5.0&quot;,
+                  metric = &quot;ROC&quot;,
+                  trControl = fitControl,
+                  tuneGrid = c50Grid)
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-31" style="background:;">
+  <article data-timings="">
+    <pre><code class="r">plot(c50Fit2)
+</code></pre>
+
+<p><img src="assets/fig/c50wire2-1.png" alt="plot of chunk c50wire2"> </p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-32" style="background:;">
+  <hgroup>
+    <h3>Model Evaluation</h3>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">xx &lt;- c50Fit2$bestTune
+subset(c50Fit2$results,trials == xx[[1]] &amp; model == xx[[2]] &amp; winnow == xx[[3]])
+</code></pre>
+
+<pre><code>##    model winnow trials       ROC      Sens      Spec      ROCSD     SensSD
+## 42  tree  FALSE      8 0.8606812 0.9068182 0.6933862 0.04878892 0.02501148
+##        SpecSD
+## 42 0.08955894
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-33" style="background:;">
+  <hgroup>
+    <h3>Model Evaluation</h3>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">testPred &lt;- predict(c50Fit2, testTrans)
+ confusionMatrix(testPred, ytest)$table
+</code></pre>
+
+<pre><code>##           Reference
+## Prediction Dead Alive
+##      Dead    94    22
+##      Alive   15    46
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-34" style="background:;">
+  <hgroup>
+    <h2>What about big models?</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>Need to do things in parallel</li>
+<li>doMC from Revolution R makes it easy</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-35" style="background:;">
+  <hgroup>
+    <h2>Parallel Processing Example</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>You need to sum a list of 1000 numbers</li>
+<li>Cut that into 10 lists of 100 numbers</li>
+<li>Hand to 10 of your friends to sum each list</li>
+<li>They give you back 10 numbers to sum</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-36" style="background:;">
+  <article data-timings="">
+    <pre><code class="r"> gbmGrid &lt;-  expand.grid(interaction.depth = c(6:10),
+                         n.trees = (5:10)*50,
+                         shrinkage = c(20:25)*.001,
+                         n.minobsinnode = c(20:25))
+dim(gbmGrid)
+</code></pre>
+
+<pre><code>## [1] 1080    4
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-37" style="background:;">
+  <article data-timings="">
+    <pre><code class="r">fitControl &lt;- trainControl(## 10-fold CV
+   method = &quot;cv&quot;,
+   number = 10,
+   summaryFunction = twoClassSummary,
+   classProbs = TRUE,
+   allowParallel = TRUE)
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-38" style="background:;">
+  <article data-timings="">
+    <pre><code class="r">library(doMC)
+</code></pre>
+
+<pre><code>## Loading required package: foreach
+## foreach: simple, scalable parallel programming from Revolution Analytics
+## Use Revolution R for scalability, fault tolerance and more.
+## http://www.revolutionanalytics.com
+## Loading required package: iterators
+## Loading required package: parallel
+</code></pre>
+
+<pre><code class="r">registerDoMC(cores = 3)
+
+# Do not run this
+gbmFit2 &lt;- train(x= trainTrans, y = ytrain,
+                  method = &quot;gbm&quot;,
+                  trControl = fitControl,
+                  verbose = FALSE,
+                  metric= &quot;ROC&quot;,
+                  tuneGrid = gbmGrid)
+</code></pre>
+
+<pre><code>## Loading required package: gbm
+## Loading required package: survival
+## 
+## Attaching package: &#39;survival&#39;
+## 
+## The following object is masked from &#39;package:caret&#39;:
+## 
+##     cluster
+## 
+## Loading required package: splines
+## Loaded gbm 2.1.1
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-39" style="background:;">
+  <article data-timings="">
+    <pre><code class="r">testPred &lt;- predict(gbmFit2, testTrans)
+confusionMatrix(testPred, ytest)$table
+</code></pre>
+
+<pre><code>##           Reference
+## Prediction Dead Alive
+##      Dead    94    22
+##      Alive   15    46
+</code></pre>
+
+<pre><code class="r">xx &lt;- gbmFit2$bestTune
+subset(gbmFit2$results,n.trees == xx[[1]] &amp; interaction.depth == xx[[2]] &amp;
+         shrinkage == xx[[3]] &amp; n.minobsinnode == xx[[4]])
+</code></pre>
+
+<pre><code>##      shrinkage interaction.depth n.minobsinnode n.trees       ROC Sens
+## 4808     0.015                 3             20     400 0.8549588  0.9
+##           Spec      ROCSD     SensSD    SpecSD
+## 4808 0.6862434 0.05221323 0.02195663 0.0902832
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-40" style="background:;">
+  <article data-timings="">
+    <pre><code class="r">plot(gbmFit2)
+</code></pre>
+
+<p><img src="assets/fig/gbmplott-1.png" alt="plot of chunk gbmplott"> </p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-41" style="background:;">
+  <article data-timings="">
+    <pre><code class="r">wireframe(ROC~n.trees + (interaction.depth + shrinkage + n.minobsinnode), data = gbmFit2$results,
+          xlab = &quot;n.trees&quot;, ylab = &quot;interaction.depth + shrinkage + n.minobsinnode&quot;, main = &quot;GBM Tuning Grid&quot;,
+          drape = TRUE, colorkey = TRUE, screen = list(z = 40, x = -70),
+          zlab = list(&quot;ROC&quot;, rot = 90))
+</code></pre>
+
+<p><img src="assets/fig/gbmplot2-1.png" alt="plot of chunk gbmplot2"> </p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-42" style="background:;">
+  <hgroup>
+    <h2>Can we mush models together and get something better?</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>Ensembling commonly wins Kaggle Competitions</li>
+<li>Betting on the average</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-43" style="background:;">
+  <article data-timings="">
+    <pre><code class="r"> library(caretEnsemble)
+
+ my_control &lt;- trainControl(
+   method=&quot;cv&quot;,
+   number=10,
+   savePredictions=&quot;all&quot;,
+   classProbs=TRUE,
+   index=createFolds(ytrain, 10),
+   summaryFunction=twoClassSummary
+ )
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-44" style="background:;">
+  <article data-timings="">
+    <pre><code class="r"> model_list_big &lt;- caretList(x = trainTrans,
+                             y = ytrain,
+                             trControl=my_control,
+                             metric=&quot;ROC&quot;,
+                             methodList=c(&quot;rpart&quot;),
+                             tuneList=list(
+                               c50=caretModelSpec(method=&quot;C5.0&quot;,
+                                                  tuneGrid=c50Grid))
+   )
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-45" style="background:;">
+  <hgroup>
+    <h2>Ensemlble Correlation</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">modCorr &lt;- modelCor(resamples(model_list_big))
+modCorr
+</code></pre>
+
+<pre><code>##              c50      rpart
+## c50   1.00000000 0.08512149
+## rpart 0.08512149 1.00000000
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-46" style="background:;">
+  <article data-timings="">
+    <pre><code class="r">rf_ensemble &lt;- caretStack(
+   model_list_big,
+   method=&quot;rf&quot;,
+   metric=&quot;ROC&quot;,
+   trControl=trainControl(
+     method=&quot;cv&quot;,
+     number=10,
+     savePredictions=&quot;final&quot;,
+     classProbs=TRUE,
+     summaryFunction=twoClassSummary
+   )
+ )
+</code></pre>
+
+<pre><code>## note: only 1 unique complexity parameters in default grid. Truncating the grid to 1 .
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-47" style="background:;">
+  <article data-timings="">
+    <pre><code class="r"> model_preds &lt;- predict(rf_ensemble, newdata=testTrans)
+ confusionMatrix(model_preds, ytest)$table
+</code></pre>
+
+<pre><code>##           Reference
+## Prediction Dead Alive
+##      Dead    85    21
+##      Alive   24    47
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-48" style="background:;">
+  <hgroup>
+    <h3>Using Final Test Data</h3>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">testFinal &lt;- read.csv(&quot;TestTitanic.csv&quot;)
+submission &lt;- data.frame(PassengerId = testFinal$PassengerId)
+
+testFinal$Cabin &lt;- substr(testFinal$Cabin, 1, 1)
+testFinal[which(testFinal$Cabin == &quot;&quot;),&quot;Cabin&quot;] &lt;- &quot;No.Cabin&quot;
+testFinal$Cabin &lt;- factor(testFinal$Cabin)
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-49" style="background:;">
+  <article data-timings="">
+    <pre><code class="r">testFinalTrans &lt;- predict(preProcValues, testFinal)
+testFinalTrans &lt;- predict(dummies,newdata = testFinal)
+
+testFinal &lt;- predict(dummies,newdata = testFinal)
+colnames(testFinalTrans)[which(colnames(testFinalTrans) == &quot;Cabin.No.Cabin&quot;)] &lt;- c(&quot;Cabin.&quot;)
+submission$Survived &lt;- as.numeric(predict(c50Fit2, testFinalTrans)) - 1
+</code></pre>
+
+<pre><code>## Error in newdata[, object$predictors, drop = FALSE]: subscript out of bounds
+</code></pre>
+
+<pre><code class="r">write.csv(submission, file = &quot;c50Fit2_submission.csv&quot;, row.names=FALSE)
+
+submission$Survived &lt;- as.numeric(predict(gbmFit2, testFinalTrans)) - 1
+write.csv(submission, file = &quot;gbmFit2_submission.csv&quot;, row.names=FALSE)
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='NA'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Data Workflow'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='Data Workflow With caret'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='Cut Data'>
+         4
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=5 title='Ex: Split into test and train'>
+         5
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=6 title='Why not just use sample()?'>
+         6
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=7 title='Data Partition'>
+         7
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=8 title='Ex: Split into test and train'>
+         8
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=9 title='Ex: Split into test and train'>
+         9
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=10 title='Preprocess'>
+         10
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=11 title='The Meat: Preprocess()'>
+         11
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=12 title='Data Workflow'>
+         12
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=13 title='Ex: Preprocess - Dummies'>
+         13
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=14 title='We need to get rid of Near Zero Variance Predictors'>
+         14
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=15 title='Ex: Preprocess - NZV'>
+         15
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=16 title='Ex: Preprocess - NZV'>
+         16
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=17 title='Ex: Preprocess - Linear Combinations'>
+         17
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=18 title='Some things to know'>
+         18
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=19 title='Feature Importance'>
+         19
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=20 title='NA'>
+         20
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=21 title='Our Model: C5.0'>
+         21
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=22 title='Putting it all together with train()'>
+         22
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=23 title='Model Tuning: tuneGrid'>
+         23
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=24 title='expand.grid is great'>
+         24
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=25 title='Plotting Grid'>
+         25
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=26 title='Model Evaluation'>
+         26
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=27 title='Plotting Model Eval'>
+         27
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=28 title='Control Function'>
+         28
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=29 title='Model Evaluation'>
+         29
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=30 title='Trying again'>
+         30
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=31 title='NA'>
+         31
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=32 title='Model Evaluation'>
+         32
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=33 title='Model Evaluation'>
+         33
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=34 title='What about big models?'>
+         34
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=35 title='Parallel Processing Example'>
+         35
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=36 title='NA'>
+         36
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=37 title='NA'>
+         37
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=38 title='NA'>
+         38
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=39 title='NA'>
+         39
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=40 title='NA'>
+         40
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=41 title='NA'>
+         41
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=42 title='Can we mush models together and get something better?'>
+         42
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=43 title='NA'>
+         43
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=44 title='NA'>
+         44
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=45 title='Ensemlble Correlation'>
+         45
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=46 title='NA'>
+         46
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=47 title='NA'>
+         47
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=48 title='Using Final Test Data'>
+         48
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=49 title='NA'>
+         49
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
