@@ -991,7 +991,7 @@ colnames(testFinalTrans)[which(colnames(testFinalTrans) == &quot;Cabin.No.Cabin&
 submission$Survived &lt;- as.numeric(predict(c50Fit2, testFinalTrans)) - 1
 </code></pre>
 
-<pre><code>## Error in newdata[, object$predictors, drop = FALSE]: subscript out of bounds
+<pre><code>## 
 </code></pre>
 
 <pre><code class="r">write.csv(submission, file = &quot;c50Fit2_submission.csv&quot;, row.names=FALSE)
