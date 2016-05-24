@@ -814,9 +814,6 @@ colnames(testFinalTrans)[which(colnames(testFinalTrans) == "Cabin.No.Cabin")] <-
 submission$Survived <- as.numeric(predict(c50Fit2, testFinalTrans)) - 1
 ```
 
-```
-## Error in newdata[, object$predictors, drop = FALSE]: subscript out of bounds
-```
 
 ```r
 write.csv(submission, file = "c50Fit2_submission.csv", row.names=FALSE)
